@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>手机预览二维码</title>
+<style>
+  body { margin: 0; font-family: "Microsoft YaHei", sans-serif; background: #f2f4f8;
+         display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .qr-wrap { background: #fff; border-radius: 14px; padding: 32px 40px; text-align: center;
+             box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+  h2 { margin: 0 0 6px; color: #1f2430; font-size: 20px; }
+  .sub { color: #8a93a2; font-size: 13px; margin-bottom: 20px; }
+  #qrcode { display: inline-block; padding: 14px; background: #fff; border: 1px solid #e3e8ee; border-radius: 8px; }
+</style>
+</head>
+<body>
+  <div class="qr-wrap">
+    <h2>手机预览</h2>
+    <div class="sub">请使用手机扫描下方二维码打开</div>
+    <div id="qrcode"></div>
+  </div>
+  <script src="js/vendor/qrcode.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    // 二维码内容：qrcode.html 与 index.html 同目录部署，取当前页面所在目录即可
+    // （本地 http://<IP>:8080/qrcode.html → 根目录；服务器 http://host/tp/qrcode.html → /tp/）
+    var url = location.href.replace(/[^/]*$/, '')
+    new QRCode(document.getElementById('qrcode'), { text: url, width: 240, height: 240, correctLevel: QRCode.CorrectLevel.M })
+  </script>
+</body>
+</html>

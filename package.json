@@ -1,0 +1,18 @@
+{
+  "name": "h5-out-instrument-order",
+  "version": "1.0.0",
+  "description": "消毒供应运营管理系统 供应商端 H5",
+  "scripts": {
+    "serve": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "qrcodejs": "^1.0.0",
+    "vue": "^2.7.16"
+  },
+  "devDependencies": {
+    "jsdom": "^22.1.0"
+  }
+}

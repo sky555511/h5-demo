@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "siliconflow-vision": {
+      "command": "node",
+      "args": ["C:\\Users\\Administrator\\Desktop\\h5-demo\\.reasonix\\mcp\\siliconflow-vision-mcp.js"],
+      "env": {
+        "SILICONFLOW_API_KEY": "sk-yzsucoviqhwmthlhagyltaxhhjxcoujjrtxdshoywguxlqxg"
+      }
+    }
+  }
+}
