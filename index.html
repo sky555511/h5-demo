@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>消毒供应运营管理系统 · 供应商端</title>
-  <link rel="stylesheet" href="css/app.css?v=20260916-login1">
+  <link rel="stylesheet" href="css/app.css?v=20260907-tag-right">
 </head>
 <body>
   <div id="app">
@@ -23,8 +23,8 @@
       <!-- ============ 视图：登录 ============ -->
       <main v-show="view === 'login'" class="app-main page-login">
         <div class="login-brand">
-          <div class="login-logo"><img src="img/logo.png" alt="外来厂家下单平台"></div>
-          <div class="login-title">外来厂家下单平台</div>
+          <div class="login-logo"><img src="img/logo.png" alt="消毒供应运营管理系统"></div>
+          <div class="login-title">消毒供应运营管理系统</div>
         </div>
         <div class="login-card">
           <div class="form-item">
@@ -84,13 +84,13 @@
         <!-- 订单卡片列表 -->
         <div class="list-head">
           <span>共 {{ filteredOrders.length }} 条订单</span>
-          <span class="list-head-hint">未回收订单可修改或删除</span>
+          <span class="list-head-hint">未回收订单可二次修改</span>
         </div>
         <div v-if="filteredOrders.length === 0" class="empty">
           <div class="empty-icon">📭</div>
           <div>暂无符合条件的订单</div>
         </div>
-        <div v-for="o in filteredOrders" :key="o.id" class="order-card" :class="{ recycled: isRecycled(o) }">
+        <div v-for="o in filteredOrders" :key="o.id" class="order-card" :class="{ recycled: !!o.recycleTime }">
           <div class="card-top">
             <span class="order-no">{{ o.serialNumber }}</span>
             <span class="status-tag" :class="statusClass(o)">{{ statusText(o) }}</span>
@@ -113,11 +113,10 @@
             <div class="meta-row"><label>器械包</label><span class="meta-pkg">{{ o.packageTemplateName }}</span></div>
           </div>
           <div class="card-foot">
-            <span class="card-time">{{ isRecycled(o) ? (o.recycleTime === '已回收' ? '供应室已回收' : '回收时间 ' + o.recycleTime) : '下单时间 ' + o.orderTime }}</span>
+            <span class="card-time">{{ o.recycleTime ? '回收时间 ' + o.recycleTime : '下单时间 ' + o.orderTime }}</span>
             <div class="card-actions">
               <button class="btn btn-ghost" @click="showQrcode(o)">生成二维码</button>
-              <button v-if="!isRecycled(o)" class="btn btn-primary" @click="startEdit(o)">编辑</button>
-              <button v-if="!isRecycled(o)" class="btn btn-danger-ghost" @click="deleteOrder(o)">删除</button>
+              <button v-if="!o.recycleTime" class="btn btn-primary" @click="startEdit(o)">编辑</button>
             </div>
           </div>
         </div>
@@ -394,10 +393,6 @@
           <div class="success-sub">订单号：{{ lastOrder.serialNumber }}</div>
           <div class="qrcode-card">
             <div ref="successQrcode" class="qrcode-box"></div>
-            <div class="qrcode-meta">
-              <div class="qrcode-meta-row"><label>外来器械</label><span>{{ lastOrder.packageTemplateName || '-' }}</span></div>
-              <div class="qrcode-meta-row"><label>住院号</label><span>{{ lastOrder.hospitalizationNum || '-' }}</span></div>
-            </div>
             <div class="qrcode-tip">供应商可截图保存，或点击下方按钮下载二维码图片</div>
           </div>
           <button class="btn btn-ghost btn-lg btn-block" @click="downloadQrcode($refs.successQrcode)">保存二维码图片</button>
@@ -421,11 +416,7 @@
           <div class="qrcode-dialog-title">订单二维码</div>
           <div class="qrcode-dialog-no">{{ qrcodeOrder.serialNumber }}</div>
           <div ref="dialogQrcode" class="qrcode-box"></div>
-          <div class="qrcode-meta">
-            <div class="qrcode-meta-row"><label>外来器械</label><span>{{ qrcodeOrder.packageTemplateName || '-' }}</span></div>
-            <div class="qrcode-meta-row"><label>住院号</label><span>{{ qrcodeOrder.hospitalizationNum || '-' }}</span></div>
-          </div>
-          <div class="qrcode-dialog-info" v-if="qrcodeOrder.bookHospitalName">{{ qrcodeOrder.bookHospitalName }}</div>
+          <div class="qrcode-dialog-info">{{ qrcodeOrder.bookHospitalName }} · {{ qrcodeOrder.packageTemplateName }}</div>
           <button class="btn btn-ghost btn-sm" @click="downloadQrcode($refs.dialogQrcode)">保存图片</button>
           <button class="btn btn-plain btn-sm" @click="closeQrcode">关闭</button>
         </div>
@@ -469,7 +460,7 @@
   <script src="js/vendor/vue.min.js"></script>
   <script src="js/vendor/qrcode.min.js"></script>
   <script src="js/vendor/crypto-js.js"></script>
-  <script src="js/api.js?v=20260916-login1"></script>
-  <script src="js/app.js?v=20260916-login1"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
