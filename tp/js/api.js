@@ -12,7 +12,7 @@ window.API = (function () {
   'use strict'
 
   var CONFIG = {
-    baseURL: 'http://127.0.0.1:8899/', // 后端接口根地址
+    baseURL: '/api', // 后端接口根地址
     timeout: 15000,            // 请求超时（ms）
 
     sessionKey: 'h5_out_user', // 登录态 localStorage key
