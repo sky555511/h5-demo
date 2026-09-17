@@ -105,6 +105,75 @@
     }
   }
 
+  function wrapCanvasText (ctx, text, maxWidth) {
+    var s = String(text || '')
+    var lines = []
+    var line = ''
+    for (var i = 0; i < s.length; i++) {
+      var next = line + s.charAt(i)
+      if (line && ctx.measureText(next).width > maxWidth) {
+        lines.push(line)
+        line = s.charAt(i)
+      } else {
+        line = next
+      }
+    }
+    if (line) lines.push(line)
+    return lines.length ? lines : ['']
+  }
+
+  // 保存用合成图：二维码 + 外来器械名称 + 住院号
+  function composeQrcodeImage (qrCanvas, order) {
+    var serial = (order && order.serialNumber) || ''
+    var pkgName = (order && order.packageTemplateName) || '-'
+    var zy = (order && order.hospitalizationNum) || '-'
+    var pad = 36
+    var qrSize = 400
+    var width = 520
+    var probe = document.createElement('canvas').getContext('2d')
+    probe.font = '26px sans-serif'
+    var maxText = width - pad * 2
+    var pkgLines = wrapCanvasText(probe, '外来器械  ' + pkgName, maxText)
+    var zyLines = wrapCanvasText(probe, '住院号  ' + zy, maxText)
+    var titleH = 44
+    var lineH = 36
+    var gap = 18
+    var height = pad + titleH + gap + qrSize + gap + pkgLines.length * lineH + 10 + zyLines.length * lineH + pad
+
+    var out = document.createElement('canvas')
+    out.width = width
+    out.height = height
+    var ctx = out.getContext('2d')
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, width, height)
+
+    ctx.fillStyle = '#1b4fd8'
+    ctx.font = 'bold 28px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'top'
+    ctx.fillText(serial || '订单二维码', width / 2, pad)
+
+    var qrX = Math.round((width - qrSize) / 2)
+    var qrY = pad + titleH + gap
+    ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize)
+
+    ctx.textAlign = 'left'
+    ctx.fillStyle = '#1f2430'
+    ctx.font = '26px sans-serif'
+    var y = qrY + qrSize + gap
+    pkgLines.forEach(function (line) {
+      ctx.fillText(line, pad, y)
+      y += lineH
+    })
+    y += 8
+    ctx.fillStyle = '#5b6472'
+    zyLines.forEach(function (line) {
+      ctx.fillText(line, pad, y)
+      y += lineH
+    })
+    return out
+  }
+
   /* ---------- 根实例 ---------- */
   new Vue({
     el: '#app',
@@ -473,12 +542,15 @@
         this.filterDraft = Object.assign({}, def)
         this.filter = Object.assign({}, def)
       },
+      isRecycled: function (o) {
+        return !!(o && o.recycleTime)
+      },
       statusText: function (o) {
         // 仅两种状态：下单后待回收 / 供应室已回收
-        return o.recycleTime ? '已回收' : '待回收'
+        return this.isRecycled(o) ? '已回收' : '待回收'
       },
       statusClass: function (o) {
-        return o.recycleTime ? 'recycled' : ''
+        return this.isRecycled(o) ? 'recycled' : ''
       },
       showQrcode: function (o) {
         this.qrcodeOrder = o
@@ -495,10 +567,12 @@
         if (!container) return
         var canvas = container.querySelector('canvas')
         if (!canvas) { this.showToast('二维码暂不可用，请直接截图保存'); return }
+        var order = this.qrcodeOrder || this.lastOrder || {}
         try {
+          var composed = composeQrcodeImage(canvas, order)
           var a = document.createElement('a')
-          a.href = canvas.toDataURL('image/png')
-          a.download = ((this.qrcodeOrder || this.lastOrder).serialNumber || 'qrcode') + '.png'
+          a.href = composed.toDataURL('image/png')
+          a.download = (order.serialNumber || 'qrcode') + '.png'
           document.body.appendChild(a)
           a.click()
           document.body.removeChild(a)
@@ -506,9 +580,23 @@
           this.showToast('保存失败，请长按二维码截图')
         }
       },
+      deleteOrder: function (o) {
+        if (!o || !o.id || this.isRecycled(o)) return
+        var self = this
+        var no = o.serialNumber || ''
+        this.confirmDialog('确认删除订单' + (no ? ' ' + no : '') + '？删除后不可恢复。', function () {
+          API.deleteOutInstrumentOrder(o.id).then(function () {
+            self.showToast('订单已删除')
+            self.loadOrders(true)
+          }).catch(function (e) {
+            self.showToast((e && e.message) || '删除失败，请稍后重试')
+          })
+        })
+      },
 
       /* ================= 二次修改：载入订单 ================= */
       startEdit: function (o) {
+        if (this.isRecycled(o)) { this.showToast('已回收订单不可编辑'); return }
         this.editFlag = true
         this.editingId = o.id
         this.step = 0

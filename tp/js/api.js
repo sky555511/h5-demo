@@ -12,7 +12,7 @@ window.API = (function () {
   'use strict'
 
   var CONFIG = {
-    baseURL: '/api', // 后端接口根地址
+    baseURL: 'http://127.0.0.1:8899/', // 后端接口根地址
     timeout: 15000,            // 请求超时（ms）
 
     sessionKey: 'h5_out_user', // 登录态 localStorage key
@@ -34,7 +34,8 @@ window.API = (function () {
       getOutInstrumentOrder: '/out/getOutInstrumentOrder', // GET 订单主信息（编辑回填）
       getOutOrderDetailList: '/out/getOutOrderDetailList', // GET 订单分包明细（编辑回填）
       orderList: '/out/getOutOrderList', // GET 订单列表（ListPageDto{total,list}）
-      saveOrder: '/out/saveOrUpdateOutOrder'   // POST 下单（body: { outInstrumentOrder, outPackages }）
+      saveOrder: '/out/saveOrUpdateOutOrder',   // POST 下单（body: { outInstrumentOrder, outPackages }）
+      deleteOutInstrumentOrder: '/out/deleteOutInstrumentOrder' // POST 删除未回收订单（body: { id }）
     },
 
     // 订单二维码内容：默认订单号（与网页版一致）；如需扫码回跳地址可改为
@@ -89,11 +90,24 @@ window.API = (function () {
 
   // 毫秒时间戳 → 'YYYY-MM-DD HH:mm'（h5 展示/筛选统一格式）
   function formatTime (ts) {
-    if (!ts && ts !== 0) return ''
-    var d = new Date(Number(ts))
+    if (ts === undefined || ts === null || ts === '') return ''
+    var d = ts instanceof Date ? ts : new Date(typeof ts === 'number' ? ts : String(ts).replace(/-/g, '/'))
     if (isNaN(d.getTime())) return ''
     function p (n) { return n < 10 ? '0' + n : '' + n }
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes())
+  }
+
+  // 供应室已回收：以回收时间为主；列表若只给回收标记/文案也视为已回收
+  // 注意：orderStatus=1 在本系统表示已确认，不是已回收，不能用来隐藏删除按钮
+  function isRecycledOrder (o) {
+    if (!o) return false
+    if (o.recycleTime) return true
+    if (o.recycledTime) return true
+    if (o.recycleDate) return true
+    if (o.recycleFlag === true || o.recycleFlag === 1 || o.recycleFlag === '1') return true
+    var statusText = o.orderStatusText || o.statusText || o.statusName
+    if (statusText === '已回收') return true
+    return false
   }
 
   // h5 筛选条件 → 后端时间范围
@@ -427,7 +441,7 @@ window.API = (function () {
       id: o.id,
       serialNumber: o.serialNumber,
       orderTime: formatTime(o.orderTime),
-      recycleTime: o.recycleTime ? formatTime(o.recycleTime) : null,
+      recycleTime: isRecycledOrder(o) ? (formatTime(o.recycleTime || o.recycledTime || o.recycleDate) || '已回收') : null,
       bookHospitalId: o.hospitalModel ? o.hospitalModel.id : null,
       bookDepartmentId: o.departmentModel ? o.departmentModel.id : null,
       packageTemplateId: o.packageTemplateModel ? o.packageTemplateModel.id : null,
@@ -452,7 +466,7 @@ window.API = (function () {
       id: o.orderId,
       serialNumber: o.serialNumber,
       orderTime: formatTime(o.orderTime),
-      recycleTime: o.recycleTime ? formatTime(o.recycleTime) : null,
+      recycleTime: isRecycledOrder(o) ? (formatTime(o.recycleTime || o.recycledTime || o.recycleDate) || '已回收') : null,
       bookHospitalName: o.hospitalName || '',
       bookDepartmentName: o.departmentName || '',
       packageTemplateName: o.packageTemplateName || '',
@@ -557,6 +571,11 @@ window.API = (function () {
     })
   }
 
+  /** 删除未回收订单（对齐网页版 POST /out/deleteOutInstrumentOrder，body: { id }） */
+  function deleteOutInstrumentOrder (orderId) {
+    return request('POST', CONFIG.urls.deleteOutInstrumentOrder, { id: orderId })
+  }
+
   return {
     CONFIG: CONFIG,
     request: request,
@@ -566,6 +585,7 @@ window.API = (function () {
     getHospitals: getHospitals, getDepartments: getDepartments,
     getPackages: getPackages, getPackageCompositions: getPackageCompositions, getAllInstruments: getAllInstruments,
     getOrderList: getOrderList, saveOrder: saveOrder,
+    deleteOutInstrumentOrder: deleteOutInstrumentOrder,
     getOutInstrumentOrder: getOutInstrumentOrder, getOutOrderDetailList: getOutOrderDetailList
   }
 })()
