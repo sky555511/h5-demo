@@ -252,7 +252,7 @@
               <span class="count-item"><i class="dot dot-implant"></i><span class="count-label">植入物 </span><span class="count-num">{{ subpackagesSummary.implantsNum }}</span></span>
               <span class="count-item"><i class="dot dot-power"></i><span class="count-label">电动工具 </span><span class="count-num">{{ subpackagesSummary.electricToolNum }}</span></span>
             </div>
-            <div v-for="sp in subpackages" :key="sp.serialNum" class="subpkg-card">
+            <div v-for="sp in subpackagesReversed" :key="sp.serialNum" class="subpkg-card">
               <div class="subpkg-head" @click="sp.open = !sp.open">
                 <span class="subpkg-no">{{ sp.serialNum }}</span>
                 <span class="subpkg-name">{{ sp.packageTemplateName }}</span>

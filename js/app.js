@@ -324,6 +324,10 @@
         })
         return s
       },
+      // 已分包列表倒序展示（最新分包在上），不改动底层数组与序号
+      subpackagesReversed: function () {
+        return this.subpackages.slice().reverse()
+      },
       // 预览包信息合计（全部分包 + 未分包草稿加总）
       previewSummary: function () {
         var s = { applianceNum: 0, implantsNum: 0, electricToolNum: 0 }
