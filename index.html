@@ -206,6 +206,7 @@
                 <button class="btn btn-ghost btn-sm" @click="openBatchSplit" :disabled="!draftCompositions.length">批量分包</button>
               </div>
             </div>
+            <div v-if="currentPackage" class="pkg-pick-hint">分包后点击<span>选择器械</span>可创建新的分包！</div>
 
             <!-- 草稿器械（当前编辑区） -->
             <div v-if="draftCompositions.length" class="draft-block">
