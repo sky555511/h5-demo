@@ -101,7 +101,7 @@
         correctLevel: QRCode.CorrectLevel.M
       })
     } catch (e) {
-      el.innerHTML = '<div style="color:#999;font-size:12px;text-align:center;padding-top:80px">二维码生成失败</div>'
+      el.innerHTML = '<div style="color:#999;font-size:14px;font-weight:600;text-align:center;padding-top:80px">二维码生成失败</div>'
     }
   }
 
@@ -383,9 +383,9 @@
           }
           return true
         })
-        // 已勾选的器械置顶展示（组内保持原顺序），方便查看与调整
+        // 未勾选在上、已勾选在下（组内保持原顺序）
         list.sort(function (a, b) {
-          return (self.isPicked(a) ? 0 : 1) - (self.isPicked(b) ? 0 : 1)
+          return (self.isPicked(a) ? 1 : 0) - (self.isPicked(b) ? 1 : 0)
         })
         return list
       },
@@ -943,8 +943,10 @@
       },
       removeFromDraft: function (c) {
         var self = this
-        var i = this.draftCompositions.findIndex(function (x) { return self.sameInstrument(x, c) })
-        if (i > -1) this.draftCompositions.splice(i, 1)
+        this.confirmDialog('是否删除？', function () {
+          var i = self.draftCompositions.findIndex(function (x) { return self.sameInstrument(x, c) })
+          if (i > -1) self.draftCompositions.splice(i, 1)
+        })
       },
       // 分包序号唯一递增（删除分包后仍不重复，用作 v-for key）
       nextSerialNum: function () {
@@ -1003,7 +1005,13 @@
         this.batchVisible = false
         this.showToast('已生成 ' + n + ' 个分包')
       },
-      // 删除整个分包（删除按钮 / 分包内器械删空时调用）
+      askRemoveSubpackage: function (sp) {
+        var self = this
+        this.confirmDialog('是否删除？', function () {
+          self.removeSubpackage(sp)
+        })
+      },
+      // 删除整个分包（确认后 / 分包内器械删空时调用）
       removeSubpackage: function (sp) {
         var i = this.subpackages.findIndex(function (x) { return x.serialNum === sp.serialNum })
         if (i > -1) {
@@ -1015,18 +1023,20 @@
       // 删除分包内的单个器械（并重算该分包分类统计）；删空后自动移除该分包
       removeCompositionFromSubpackage: function (sp, c) {
         var self = this
-        var i = sp.compositions.findIndex(function (x) { return self.sameInstrument(x, c) })
-        if (i === -1) return
-        sp.compositions.splice(i, 1)
-        if (sp.compositions.length === 0) {
-          this.removeSubpackage(sp)
-          this.showToast('分包器械已清空，该分包已删除')
-          return
-        }
-        var counts = calcCounts(sp.compositions)
-        sp.applianceNum = counts.applianceNum
-        sp.implantsNum = counts.implantsNum
-        sp.electricToolNum = counts.electricToolNum
+        this.confirmDialog('是否删除？', function () {
+          var i = sp.compositions.findIndex(function (x) { return self.sameInstrument(x, c) })
+          if (i === -1) return
+          sp.compositions.splice(i, 1)
+          if (sp.compositions.length === 0) {
+            self.removeSubpackage(sp)
+            self.showToast('分包器械已清空，该分包已删除')
+            return
+          }
+          var counts = calcCounts(sp.compositions)
+          sp.applianceNum = counts.applianceNum
+          sp.implantsNum = counts.implantsNum
+          sp.electricToolNum = counts.electricToolNum
+        })
       },
 
       /* ================= 提交订单 ================= */

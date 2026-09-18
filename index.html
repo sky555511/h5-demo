@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>消毒供应运营管理系统 · 供应商端</title>
-  <link rel="stylesheet" href="css/app.css?v=20260917-out-qr">
+  <link rel="stylesheet" href="css/app.css?v=20260917-pkg10">
 </head>
 <body>
   <div id="app">
@@ -22,26 +22,28 @@
 
       <!-- ============ 视图：登录 ============ -->
       <main v-show="view === 'login'" class="app-main page-login">
-        <div class="login-brand">
-          <div class="login-logo"><img src="img/logo.png" alt="消毒供应运营管理系统"></div>
-          <div class="login-title">消毒供应运营管理系统</div>
-        </div>
-        <div class="login-card">
-          <div class="form-item">
-            <label class="form-label">账号</label>
-            <input v-model="loginForm.account" class="input" placeholder="请输入供应商账号" @keydown.enter.prevent="focusLoginPwd">
+        <div class="login-inner">
+          <div class="login-brand">
+            <div class="login-logo"><img src="img/logo.png" alt="外来厂家下单平台"></div>
+            <div class="login-title">外来厂家下单平台</div>
           </div>
-          <div class="form-item">
-            <label class="form-label">密码</label>
-            <div class="input-group">
-              <input ref="loginPwdInput" v-model="loginForm.password" class="input" :type="pwdVisible ? 'text' : 'password'"
-                     placeholder="请输入密码" @keydown.enter.prevent="doLogin">
-              <button class="btn btn-plain btn-sm" style="flex:0 0 auto;" @click="pwdVisible = !pwdVisible">{{ pwdVisible ? '隐藏' : '显示' }}</button>
+          <div class="login-card">
+            <div class="form-item">
+              <label class="form-label">账号</label>
+              <input v-model="loginForm.account" class="input" placeholder="请输入供应商账号" @keydown.enter.prevent="focusLoginPwd">
             </div>
+            <div class="form-item">
+              <label class="form-label">密码</label>
+              <div class="pwd-wrap">
+                <input ref="loginPwdInput" v-model="loginForm.password" class="input pwd-input" :type="pwdVisible ? 'text' : 'password'"
+                       placeholder="请输入密码" @keydown.enter.prevent="doLogin">
+                <button type="button" class="pwd-toggle" @click="pwdVisible = !pwdVisible">{{ pwdVisible ? '隐藏' : '显示' }}</button>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-lg btn-block login-btn" :disabled="logging" @click="doLogin">
+              {{ logging ? '登录中…' : '登 录' }}
+            </button>
           </div>
-          <button class="btn btn-primary btn-lg btn-block login-btn" :disabled="logging" @click="doLogin">
-            {{ logging ? '登录中…' : '登 录' }}
-          </button>
         </div>
       </main>
 
@@ -59,7 +61,6 @@
 
         <!-- 查询筛选 -->
         <div class="search-card">
-          <div class="search-title">查询条件</div>
           <div class="chip-row">
             <span v-for="r in timeRanges" :key="r.value"
                   class="chip" :class="{ active: filterDraft.timeRange === r.value }"
@@ -77,13 +78,13 @@
           </div>
           <div class="btn-row">
             <button class="btn btn-primary" @click="applyFilter">查询</button>
-            <button class="btn btn-plain" @click="resetFilter">重置</button>
+            <button class="btn-text" @click="resetFilter">重置</button>
           </div>
         </div>
 
         <!-- 订单卡片列表 -->
         <div class="list-head">
-          <span>共 {{ filteredOrders.length }} 条订单</span>
+          <span class="list-head-count">共 <em>{{ filteredOrders.length }}</em> 条订单</span>
           <span class="list-head-hint">未回收订单可修改或删除</span>
         </div>
         <div v-if="filteredOrders.length === 0" class="empty">
@@ -121,8 +122,8 @@
             </div>
           </div>
         </div>
-        <!-- 上拉加载更多（分页） -->
-        <div class="list-load-more">
+        <!-- 上拉加载更多（分页）；空列表已有空状态，不再显示「没有更多了」 -->
+        <div v-if="filteredOrders.length" class="list-load-more">
           <span v-if="loadingMore">加载中…</span>
           <span v-else-if="noMore">没有更多了</span>
           <span v-else @click="loadMore">上拉加载更多</span>
@@ -130,7 +131,7 @@
       </main>
 
       <!-- ============ 视图：创建 / 修改订单（步骤流程） ============ -->
-      <main v-show="view === 'create'" class="app-main page-create" :class="{ 'has-tab': !editFlag }">
+      <main v-show="view === 'create'" class="app-main page-create" :class="{ 'has-tab': !editFlag, 'pkg-fill': step === 1 && pkgKeyword && !isPkgLocked }">
 
         <!-- 步骤条 -->
         <div class="steps">
@@ -145,7 +146,6 @@
         <div v-show="step === 0" class="step-panel">
           <div class="panel-title">
             <span class="panel-title-icon">1</span>手术信息
-            <span class="panel-title-hint">住院号查询可自动带出手术信息</span>
           </div>
           <div class="form-block">
             <div class="form-item">
@@ -158,7 +158,7 @@
             <div class="form-item">
               <label class="form-label">使用科室 <i class="req">*</i></label>
               <select v-model="form.bookDepartmentId" class="input" :disabled="!form.bookHospitalId">
-                <option value="">请选择使用科室</option>
+                <option value="">{{ form.bookHospitalId ? '请选择使用科室' : '请先选择预约医院' }}</option>
                 <option v-for="d in currentDepartments" :key="d.id" :value="d.id">{{ d.name }}</option>
               </select>
             </div>
@@ -183,27 +183,23 @@
           <div class="form-block">
             <div class="form-item">
               <label class="form-label">包名称 <i class="req">*</i></label>
-              <div class="input-group">
-                <input v-model="pkgKeyword" class="input" placeholder="输入包名或拼音首字母检索" :disabled="isPkgLocked">
-                <button class="btn btn-plain btn-sm" @click="clearPackage">清空</button>
+              <div class="pkg-search-wrap">
+                <input v-model="pkgKeyword" class="input" :class="{ 'has-clear': pkgKeyword }" placeholder="输入包名或拼音首字母检索" :disabled="isPkgLocked">
+                <button v-if="pkgKeyword" type="button" class="pkg-clear" @click="clearPackage">清空</button>
               </div>
               <div v-if="pkgKeyword && !isPkgLocked" class="pkg-list">
                 <div v-for="p in matchedPackages" :key="p.id" class="pkg-item" @click="selectPackage(p)">
                   <div class="pkg-item-name">{{ p.name }}</div>
-                  <div class="pkg-item-sub">点击选择</div>
                 </div>
                 <div v-if="matchedPackages.length === 0" class="pkg-empty">未找到匹配的器械包</div>
               </div>
             </div>
 
             <div v-if="currentPackage" class="pkg-selected">
-              <div class="pkg-selected-head">
-                <span class="pkg-selected-name">{{ currentPackage.name }}</span>
-              </div>
               <div class="pkg-selected-actions">
                 <button class="btn btn-primary btn-sm" @click="openPick">选择器械</button>
                 <button class="btn btn-ghost btn-sm" @click="splitPackage" :disabled="!draftCompositions.length">分包</button>
-                <button class="btn btn-ghost btn-sm" @click="openBatchSplit" :disabled="!draftCompositions.length">批量分包</button>
+                <button class="btn-text pkg-batch" @click="openBatchSplit" :disabled="!draftCompositions.length">批量分包</button>
               </div>
             </div>
             <div v-if="currentPackage" class="pkg-pick-hint">分包后点击<span>选择器械</span>可创建新的分包！</div>
@@ -211,7 +207,7 @@
             <!-- 草稿器械（当前编辑区） -->
             <div v-if="draftCompositions.length" class="draft-block">
               <div class="draft-head">
-                <span>当前器械（{{ draftCompositions.length }} 种 / 共 {{ draftTotalNum }} 件）</span>
+                <span class="draft-head-title">当前器械（<em>{{ draftCompositions.length }}</em> 种 / 共 <em>{{ draftTotalNum }}</em> 件）</span>
                 <span class="draft-hint">点击「分包」生成分包</span>
               </div>
               <div class="count-bar">
@@ -219,7 +215,7 @@
                 <span class="count-item"><i class="dot dot-implant"></i><span class="count-label">植入物 </span><span class="count-num">{{ draftSummary.implantsNum }}</span></span>
                 <span class="count-item"><i class="dot dot-power"></i><span class="count-label">电动工具 </span><span class="count-num">{{ draftSummary.electricToolNum }}</span></span>
               </div>
-              <div v-for="c in draftCompositions" :key="pickKey(c)" class="inst-row" :class="rowClass(c.type)">
+              <div v-for="c in draftCompositions" :key="pickKey(c)" class="inst-row inst-row-edit" :class="rowClass(c.type)">
                 <div class="inst-main">
                   <div class="inst-name">
                     <span class="inst-name-text">{{ c.applianceName }}</span>
@@ -237,7 +233,7 @@
                       <input type="number" min="1" max="999" class="num-input" :value="c.num" @input="setNum(c, $event.target.value)">
                       <button class="step-btn" @click="incNum(c)">＋</button>
                     </div>
-                    <button class="del-btn" @click="removeFromDraft(c)">✕</button>
+                    <button class="del-text" @click="removeFromDraft(c)">删除</button>
                   </div>
                 </div>
               </div>
@@ -257,7 +253,7 @@
               <div class="subpkg-head" @click="sp.open = !sp.open">
                 <span class="subpkg-no">{{ sp.serialNum }}</span>
                 <span class="subpkg-name">{{ sp.packageTemplateName }}</span>
-                <button class="btn btn-ghost btn-sm subpkg-del" @click.stop="removeSubpackage(sp)">删除</button>
+                <button class="btn btn-ghost btn-sm subpkg-del" @click.stop="askRemoveSubpackage(sp)">删除</button>
                 <span class="subpkg-arrow">{{ sp.open ? '▾' : '▸' }}</span>
               </div>
               <div class="subpkg-panel">
@@ -302,9 +298,9 @@
           <div class="preview-card">
             <div class="preview-card-title">手术信息</div>
             <div class="preview-grid">
-              <div class="preview-item"><label>预约医院</label><span>{{ previewHospitalName }}</span></div>
-              <div class="preview-item"><label>使用科室</label><span>{{ previewDepartmentName }}</span></div>
-              <div class="preview-item"><label>住院号</label><span>{{ form.hospitalizationNum }}</span></div>
+              <div class="preview-item wide"><label>预约医院</label><span>{{ previewHospitalName }}</span></div>
+              <div class="preview-item wide"><label>使用科室</label><span>{{ previewDepartmentName }}</span></div>
+              <div class="preview-item wide"><label>住院号</label><span>{{ form.hospitalizationNum }}</span></div>
               <div class="preview-item wide"><label>备注</label><span>{{ form.memo || '-' }}</span></div>
             </div>
           </div>
@@ -328,9 +324,16 @@
                 <span class="count-item"><i class="dot dot-power"></i><span class="count-label">电动工具 </span><span class="count-num">{{ sp.electricToolNum }}</span></span>
               </div>
               <div v-for="c in sp.compositions" :key="pickKey(c)" class="preview-line" :class="rowClass(c.type)">
-                <span>{{ c.applianceName }}</span>
-                <span class="preview-line-spec">规格 {{ c.specifical || '-' }} · 型号 {{ c.model || '-' }}</span>
-                <span class="preview-line-num">×{{ c.num }}</span>
+                <div class="preview-line-main">
+                  <div class="preview-line-top">
+                    <span class="preview-line-name">{{ c.applianceName }}</span>
+                    <span class="preview-line-num">×{{ c.num }}</span>
+                  </div>
+                  <div class="preview-line-spec">
+                    <div>规格 {{ c.specifical || '-' }}</div>
+                    <div>型号 {{ c.model || '-' }}</div>
+                  </div>
+                </div>
               </div>
             </div>
             <div v-if="!previewPackages.length" class="pkg-empty">暂无包信息</div>
@@ -399,7 +402,6 @@
               <div class="qrcode-meta-row"><label>外来器械</label><span>{{ lastOrder.packageTemplateName || '-' }}</span></div>
               <div class="qrcode-meta-row"><label>住院号</label><span>{{ lastOrder.hospitalizationNum || '-' }}</span></div>
             </div>
-            <div class="qrcode-tip">供应商可截图保存，或点击下方按钮下载二维码图片</div>
           </div>
           <button class="btn btn-ghost btn-lg btn-block" @click="downloadQrcode($refs.successQrcode)">保存二维码图片</button>
           <button class="btn btn-primary btn-lg btn-block" @click="goOrderList">返回订单管理</button>
@@ -470,7 +472,7 @@
   <script src="js/vendor/vue.min.js"></script>
   <script src="js/vendor/qrcode.min.js"></script>
   <script src="js/vendor/crypto-js.js"></script>
-  <script src="js/api.js?v=20260917-out-qr"></script>
-  <script src="js/app.js?v=20260917-out-qr"></script>
+  <script src="js/api.js?v=20260917-pkg10"></script>
+  <script src="js/app.js?v=20260917-pkg10"></script>
 </body>
 </html>
