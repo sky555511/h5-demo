@@ -234,6 +234,7 @@
 
         // 手术信息表单（字段对齐网页版 outInstrumentOrder）
         form: {
+          emergencyType: '', // 手术类型：0=择期 1=急诊 2=备用
           bookHospitalId: '', bookDepartmentId: '', hospitalizationNum: '',
           patientName: '', doctorName: '', operationName: '', operationPart: '',
           patientSection: '', bedNum: '', operationTime: '', operationRoom: '', operationStage: '', memo: ''
@@ -285,6 +286,9 @@
       },
       headerBack: function () {
         return this.view !== 'orderList' && this.view !== 'login'
+      },
+      emergencyTypeLabel: function () {
+        return { '0': '择期', '1': '急诊', '2': '备用' }[this.form.emergencyType] || '-'
       },
       // 当前登录供应商（订单按此隔离；未登录或医院用户时供应商字段为空）
       supplier: function () {
@@ -627,6 +631,7 @@
         API.getOutInstrumentOrder(o.id).then(function (main) {
           if (!main) throw { message: '订单不存在或已删除' }
           self.form = {
+            emergencyType: main.emergencyType == null ? '' : String(main.emergencyType),
             bookHospitalId: main.bookHospitalId, bookDepartmentId: main.bookDepartmentId,
             hospitalizationNum: main.hospitalizationNum, patientName: main.patientName,
             doctorName: main.doctorName, operationName: main.operationName, operationPart: main.operationPart,
@@ -679,6 +684,7 @@
         this.editingId = null
         this.step = 0
         this.form = {
+          emergencyType: '',
           bookHospitalId: '', bookDepartmentId: '', hospitalizationNum: '',
           patientName: '', doctorName: '', operationName: '', operationPart: '',
           patientSection: '', bedNum: '', operationTime: '', operationRoom: '', operationStage: '', memo: ''
@@ -705,9 +711,10 @@
       /* ================= 创建订单：步骤跳转 ================= */
       stepNext: function () {
         if (this.step === 0) {
+          if (this.form.emergencyType === '') { this.showToast('请选择手术类型'); return }
           if (!this.form.bookHospitalId) { this.showToast('请选择预约医院'); return }
           if (!this.form.bookDepartmentId) { this.showToast('请选择使用科室'); return }
-          if (!(this.form.hospitalizationNum || '').trim()) { this.showToast('请输入住院号'); return }
+          if (this.form.emergencyType !== '2' && !(this.form.hospitalizationNum || '').trim()) { this.showToast('请输入住院号'); return }
           this.step = 1
         } else if (this.step === 1) {
           if (!this.currentPackage) { this.showToast('请选择器械包'); return }
@@ -1080,6 +1087,7 @@
           bookHospitalName: this.previewHospitalName,
           bookDepartmentId: Number(this.form.bookDepartmentId),
           bookDepartmentName: this.previewDepartmentName,
+          emergencyType: Number(this.form.emergencyType),
           hospitalizationNum: this.form.hospitalizationNum,
           patientName: this.form.patientName,
           doctorName: this.form.doctorName,
