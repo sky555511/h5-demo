@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>外来厂家下单平台</title>
-  <link rel="stylesheet" href="css/app.css?v=20260924-ui12">
+  <link rel="stylesheet" href="css/app.css?v=20260924-ui29">
 </head>
 <body>
   <div id="app">
@@ -24,20 +24,27 @@
       <main v-show="view === 'login'" class="app-main page-login">
         <div class="login-inner">
           <div class="login-brand">
-            <div class="login-logo"><img src="img/logo-login.png" alt="外来厂家下单平台"></div>
+            <div class="login-badge"><div class="login-badge-circ"><img src="img/logo-login.png" alt="外来厂家下单平台"></div></div>
             <div class="login-title">外来厂家下单平台</div>
           </div>
           <div class="login-card">
             <div class="form-item">
               <label class="form-label">账号</label>
-              <input v-model="loginForm.account" class="input" placeholder="请输入供应商账号" @keydown.enter.prevent="focusLoginPwd">
+              <div class="input-ico">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="#5f86a6" stroke-width="2"/><path d="M4 20c1.8-3.4 4.6-5 8-5s6.2 1.6 8 5" fill="none" stroke="#5f86a6" stroke-width="2" stroke-linecap="round"/></svg>
+                <input v-model="loginForm.account" class="input" placeholder="请输入供应商账号" @keydown.enter.prevent="focusLoginPwd">
+              </div>
             </div>
             <div class="form-item">
               <label class="form-label">密码</label>
               <div class="pwd-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2.5" fill="none" stroke="#5f86a6" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="#5f86a6" stroke-width="2" stroke-linecap="round"/></svg>
                 <input ref="loginPwdInput" v-model="loginForm.password" class="input pwd-input" :type="pwdVisible ? 'text' : 'password'"
                        placeholder="请输入密码" @keydown.enter.prevent="doLogin">
-                <button type="button" class="pwd-toggle" @click="pwdVisible = !pwdVisible">{{ pwdVisible ? '隐藏' : '显示' }}</button>
+                <button type="button" class="pwd-toggle" @click="pwdVisible = !pwdVisible" :aria-label="pwdVisible ? '隐藏密码' : '显示密码'">
+                  <svg v-if="pwdVisible" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="#5f86a6" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="#5f86a6" stroke-width="2"/><line x1="4" y1="4" x2="20" y2="20" stroke="#5f86a6" stroke-width="2" stroke-linecap="round"/></svg>
+                  <svg v-else viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="#5f86a6" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="#5f86a6" stroke-width="2"/></svg>
+                </button>
               </div>
             </div>
             <button class="btn btn-primary btn-lg btn-block login-btn" :disabled="logging" @click="doLogin">
@@ -131,7 +138,7 @@
       </main>
 
       <!-- ============ 视图：创建 / 修改订单（步骤流程） ============ -->
-      <main v-show="view === 'create'" class="app-main page-create" :class="{ 'has-tab': !editFlag, 'pkg-fill': step === 1 && pkgKeyword && !isPkgLocked }">
+      <main v-show="view === 'create'" class="app-main page-create" :class="{ 'pkg-fill': step === 1 && pkgKeyword && !isPkgLocked }">
 
         <!-- 步骤条 -->
         <div class="steps">
@@ -149,15 +156,6 @@
           </div>
           <div class="form-block">
             <div class="form-item">
-              <label class="form-label">手术类型 <i class="req">*</i></label>
-              <select v-model="form.emergencyType" class="input">
-                <option value="">请选择手术类型</option>
-                <option value="0">择期</option>
-                <option value="1">急诊</option>
-                <option value="2">备用</option>
-              </select>
-            </div>
-            <div class="form-item">
               <label class="form-label">预约医院 <i class="req">*</i></label>
               <select v-model="form.bookHospitalId" class="input" @change="onHospitalChange">
                 <option value="">请选择预约医院</option>
@@ -169,6 +167,15 @@
               <select v-model="form.bookDepartmentId" class="input" :disabled="!form.bookHospitalId">
                 <option value="">{{ form.bookHospitalId ? '请选择使用科室' : '请先选择预约医院' }}</option>
                 <option v-for="d in currentDepartments" :key="d.id" :value="d.id">{{ d.name }}</option>
+              </select>
+            </div>
+            <div class="form-item">
+              <label class="form-label">手术类型 <i class="req">*</i></label>
+              <select v-model="form.emergencyType" class="input">
+                <option value="">请选择手术类型</option>
+                <option value="0">择期</option>
+                <option value="1">急诊</option>
+                <option value="2">备用</option>
               </select>
             </div>
             <div v-if="form.emergencyType === '0' || form.emergencyType === '1'" class="form-item">
@@ -260,7 +267,7 @@
                   <span class="count-item"><i class="dot dot-implant"></i><span class="count-label">植入物 </span><span class="count-num">{{ sp.implantsNum }}</span></span>
                   <span class="count-item"><i class="dot dot-power"></i><span class="count-label">电动工具 </span><span class="count-num">{{ sp.electricToolNum }}</span></span>
                 </div>
-                <button class="btn btn-ghost btn-sm subpkg-edit" @click.stop="editSubpackage(sp)">重新编辑</button>
+                <button type="button" class="subpkg-edit" @click.stop="editSubpackage(sp)">编辑</button>
               </div>
               <div v-show="sp.open" class="subpkg-body">
                 <div v-for="c in sp.compositions" :key="pickKey(c)" class="inst-row sub inst-row-stacked" :class="rowClass(c.type)">
@@ -398,7 +405,7 @@
       </main>
 
       <!-- ============ 底部导航 ============ -->
-      <nav v-if="view === 'orderList' || (view === 'create' && !editFlag)" class="tab-bar">
+      <nav v-if="view === 'orderList'" class="tab-bar">
         <div class="tab-item" :class="{ active: view === 'orderList' }" @click="goOrderList">
           <span class="tab-icon">📋</span><span>订单管理</span>
         </div>
@@ -462,6 +469,6 @@
   <script src="js/vendor/qrcode.min.js"></script>
   <script src="js/vendor/crypto-js.js"></script>
   <script src="js/api.js?v=20260924-ui6"></script>
-  <script src="js/app.js?v=20260924-ui12"></script>
+  <script src="js/app.js?v=20260924-ui14"></script>
 </body>
 </html>

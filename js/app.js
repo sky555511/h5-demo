@@ -488,12 +488,15 @@
       },
 
       /* ================= 导航 ================= */
-      typeClass: function (t) {
+      typeKey: function (t) {
         return { '植入物': 'implant', '电动工具': 'power', '辅助材料': 'assist' }[t] || 'tool'
+      },
+      typeClass: function (t) {
+        return 'type-' + this.typeKey(t)
       },
       // 器械行类型 class（行级配色：左侧色条 + 底色微染）
       rowClass: function (t) {
-        return 'row-' + this.typeClass(t)
+        return 'row-' + this.typeKey(t)
       },
       goOrderList: function () {
         this.view = 'orderList'
@@ -711,9 +714,9 @@
       /* ================= 创建订单：步骤跳转 ================= */
       stepNext: function () {
         if (this.step === 0) {
-          if (this.form.emergencyType === '') { this.showToast('请选择手术类型'); return }
           if (!this.form.bookHospitalId) { this.showToast('请选择预约医院'); return }
           if (!this.form.bookDepartmentId) { this.showToast('请选择使用科室'); return }
+          if (this.form.emergencyType === '') { this.showToast('请选择手术类型'); return }
           if (this.form.emergencyType !== '2' && !(this.form.hospitalizationNum || '').trim()) { this.showToast('请输入住院号'); return }
           this.step = 1
         } else if (this.step === 1) {

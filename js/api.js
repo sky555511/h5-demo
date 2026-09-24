@@ -338,9 +338,14 @@ window.API = (function () {
     })
   }
 
-  /** 包组成明细（/package/getPackageCompositions，返回 h5 器械数组） */
+  /** 包组成明细（/package/getPackageCompositions，返回 h5 器械数组）
+   *  ifUseOrder=false、ifOutTypeOrder=true：按外来订单类型取包组成，不走院内订单组成 */
   function getPackageCompositions (packageTemplateId) {
-    return request('GET', CONFIG.urls.getPackageCompositions + '?packageTemplateId=' + encodeURIComponent(packageTemplateId)).then(function (res) {
+    return request('GET', CONFIG.urls.getPackageCompositions + '?' + qs({
+      packageTemplateId: packageTemplateId,
+      ifUseOrder: false,
+      ifOutTypeOrder: true
+    })).then(function (res) {
       var list = Array.isArray(res) ? res : ((res && res.list) || [])
       return list.map(normalizeComposition)
     })

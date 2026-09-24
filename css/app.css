@@ -4,11 +4,11 @@
    ============================================================ */
 
 :root {
-  --primary: #2563eb;
-  --primary-dark: #1e4fd6;
-  --primary-light: #eaf1ff;
-  --accent: #00b894;
-  --accent-light: #e0f7f0;
+  --primary: #1a72b8;
+  --primary-dark: #14588f;
+  --primary-light: #e8f2fb;
+  --accent: #3f8f28;
+  --accent-light: #eaf4dc;
   --warning: #f59e0b;
   --warning-light: #fef3e0;
   --gray: #8a97a5;
@@ -17,7 +17,7 @@
   --text: #17233a;
   --text-2: #5a6b7c;
   --text-3: #6b7787;
-  --bg: #f4f7fd;
+  --bg: #f3f8fc;
   --card: #ffffff;
   --danger: #e5484d;
   --radius: 16px;
@@ -27,7 +27,7 @@
 
   /* 器械类型配色：器械 / 植入物 / 电动工具 / 辅助材料 */
   --type-tool: #5b84b0;
-  --type-implant: #00b894;
+  --type-implant: #3f8f28;
   --type-power: #f59e0b;
   --type-assist: #6a5ae0;
 }
@@ -78,11 +78,11 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
-  background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+  background: linear-gradient(135deg, #1a72b8 0%, #4aa9de 100%);
   color: #fff;
   position: relative;
   z-index: 10;
-  box-shadow: 0 2px 14px rgba(37,99,235,.28);
+  box-shadow: 0 2px 14px rgba(26,114,184,.28);
 }
 .header-side { width: 72px; display: flex; align-items: center; }
 .header-side-right { justify-content: flex-end; }
@@ -113,6 +113,10 @@ html, body {
 }
 .app-main::-webkit-scrollbar { display: none; }
 
+.page-order-list, .page-create, .page-pick, .page-success {
+  background: linear-gradient(180deg, #e6f2fa 0%, rgba(230,242,250,0) 300px);
+}
+
 /* ============ 通用按钮 / 输入 ============ */
 .btn {
   border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer;
@@ -125,11 +129,11 @@ html, body {
 .btn-lg { padding: 12px 20px; font-size: 17px; font-weight: 700; border-radius: 12px; }
 .btn-block { width: 100%; }
 .btn-primary {
-  background: linear-gradient(135deg, #2f6df6, #1b4fd8); color: #fff;
-  box-shadow: 0 5px 16px rgba(37,99,235,.28);
+  background: linear-gradient(180deg, #1f7cc0, #16639c); color: #fff;
+  box-shadow: 0 5px 16px rgba(26,114,184,.28);
 }
 .btn-plain { background: var(--gray-light); color: var(--text-2); }
-.btn-ghost { background: rgba(37,99,235,.05); color: var(--primary); border: 1px solid rgba(37,99,235,.4); }
+.btn-ghost { background: rgba(26,114,184,.05); color: var(--primary); border: 1px solid rgba(26,114,184,.4); }
 .btn-danger-ghost { background: rgba(220,38,38,.05); color: #dc2626; border: 1px solid rgba(220,38,38,.4); }
 
 .input {
@@ -138,7 +142,7 @@ html, body {
   background: #fff; outline: none; font-family: inherit;
   transition: border-color .15s, box-shadow .15s;
 }
-.input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+.input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,114,184,.12); }
 .input:disabled {
   background-color: var(--gray-light); color: var(--text-3); border-color: var(--line);
   box-shadow: none; cursor: not-allowed; opacity: 1;
@@ -161,7 +165,7 @@ select.input:disabled {
 /* ============ 订单管理页 ============ */
 .supplier-card {
   display: flex; align-items: center; gap: 12px;
-  background: linear-gradient(120deg, #2563eb, #2f8ff0);
+  background: linear-gradient(120deg, #1a72b8, #3f9bd4);
   border-radius: var(--radius); padding: 14px 16px;
   color: #fff; margin-bottom: 12px;
   box-shadow: var(--shadow-md);
@@ -181,47 +185,58 @@ select.input:disabled {
 
 /* ============ 登录页 ============ */
 .page-login {
-  padding: 0 22px calc(28px + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, #dfe9fd 0%, #eef3fb 34%, var(--bg) 62%);
+  padding: 0 24px calc(28px + env(safe-area-inset-bottom));
+  background: linear-gradient(155deg, #d3e9fb 0%, #e6f2fa 42%, #e6f3d5 100%);
   display: flex; flex-direction: column;
   min-height: 100%;
 }
 .login-inner { width: 100%; }
-.login-brand { text-align: center; padding-top: min(84px, 11vh); }
-.login-logo { width: 80px; height: 80px; margin: 0 auto 14px; }
-.login-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.login-title { font-size: 26px; font-weight: 800; letter-spacing: 2px; color: var(--text); }
-.login-card {
-  background: var(--card); border-radius: 20px; padding: 24px 18px 20px;
-  border: 1px solid var(--line);
-  box-shadow: 0 6px 18px rgba(30,64,120,.07);
-  margin-top: 30px;
+.login-brand { text-align: center; padding-top: min(88px, 11vh); }
+.login-badge { width: 100px; height: 100px; margin: 0 auto 14px; position: relative; }
+.login-badge-circ {
+  width: 100px; height: 100px;
+  display: flex; align-items: center; justify-content: center;
 }
-.login-card .form-item { margin-bottom: 16px; }
-.login-card .form-label { font-size: 15px; font-weight: 800; margin-bottom: 7px; }
+.login-badge-circ img { width: 100px; height: 100px; object-fit: contain; display: block; }
+.login-title { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: #143a5c; }
+.login-card {
+  background: #fff; border-radius: 18px; padding: 22px 18px 20px;
+  box-shadow: 0 10px 30px rgba(30,90,140,.12);
+  margin-top: 34px;
+}
+.login-card .form-item { margin-bottom: 13px; }
+.login-card .form-label { font-size: 15px; font-weight: 800; margin-bottom: 6px; color: #1b3149; }
 .login-card .input {
-  height: 52px; border-radius: 12px; border: 1.5px solid #dbe7f6;
-  background: #f3f7fe; font-size: 16px;
+  height: 48px; border-radius: 11px; border: 1.5px solid #e4ecf3;
+  background: #f4f7fa; font-size: 16px;
 }
 .login-card .input:focus {
-  border-color: var(--primary); background: #fff;
-  box-shadow: 0 0 0 3px rgba(37,99,235,.14);
+  border-color: #1a72b8; background: #fff;
+  box-shadow: 0 0 0 3px rgba(26,114,184,.13);
 }
+.input-ico { position: relative; }
+.input-ico > svg, .pwd-wrap > svg {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  width: 20px; height: 20px; pointer-events: none;
+}
+.input-ico .input { padding-left: 42px; }
+.pwd-wrap .input { padding-left: 42px; }
+.login-card .input::placeholder { color: #7f95a9; }
 .login-btn {
-  margin-top: 22px; height: 54px; border-radius: 14px;
-  font-size: 18px; letter-spacing: 6px; text-indent: 6px;
-  box-shadow: 0 8px 20px rgba(37,99,235,.30);
+  margin-top: 18px; height: 48px; border-radius: 11px;
+  font-size: 17px;
+  background: linear-gradient(180deg, #1f7cc0, #16639c);
+  box-shadow: 0 6px 16px rgba(22,99,156,.32);
 }
 .pwd-wrap { position: relative; }
-.pwd-input { padding-right: 78px; }
+.pwd-input { padding-right: 50px; }
 .pwd-toggle {
-  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-  border: 1.5px solid rgba(37,99,235,.45); border-radius: 16px;
-  background: rgba(37,99,235,.06); color: var(--primary);
-  font-size: 14px; font-weight: 800; font-family: inherit;
-  height: 32px; line-height: 29px; padding: 0 12px; cursor: pointer;
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  border: none; background: transparent; padding: 9px; cursor: pointer;
+  display: flex; align-items: center;
 }
-.pwd-toggle:active { background: rgba(37,99,235,.16); }
+.pwd-toggle svg { width: 22px; height: 22px; display: block; }
+.pwd-toggle:active { opacity: .6; }
 
 .search-card {
   background: var(--card); border-radius: var(--radius); padding: 12px;
@@ -266,6 +281,8 @@ select.input:disabled {
 .card-top { display: flex; justify-content: space-between; align-items: center; }
 .order-no { font-size: 15px; font-weight: 700; color: var(--primary-dark); letter-spacing: .3px; }
 .order-card.recycled .order-no { color: var(--text-2); }
+.order-card.recycled .meta-row label { color: var(--text-3); }
+.order-card.recycled .meta-row span { color: var(--text-2); }
 .status-tag {
   font-size: 13px; padding: 3px 10px; border-radius: 20px; font-weight: 700;
   background: var(--primary-light); color: var(--primary);
@@ -360,17 +377,18 @@ select.input:disabled {
 .input-group .input { flex: 1; }
 
 
-/* 上一步/下一步固定底部：有底部 tab（新建订单）时固定在其上方，无 tab（编辑订单）时固定在底部 */
+/* 上一步/下一步固定底部（创建/修改流程不再显示底部 tab） */
 .step-footer {
-  position: absolute; left: 12px; right: 12px; bottom: 0;
+  position: absolute; left: 0; right: 0; bottom: 0;
   display: flex; gap: 10px; margin-top: 0;
-  padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(255,255,255,.96);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--line);
   z-index: 5;
 }
 .step-footer .btn { flex: 1; }
-/* 有底部 tab 时，按钮固定在 tab 栏上方（tab-bar 高 62px） */
-.page-create.has-tab .step-footer { bottom: 62px; }
-.page-create.has-tab { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
 .page-create { display: flex; flex-direction: column; }
 .page-create .steps { flex: 0 0 auto; }
 .page-create.pkg-fill { overflow: hidden; }
@@ -425,9 +443,9 @@ select.input:disabled {
   font-size: 15px;
   font-weight: 600;
   line-height: 1.5;
-  color: #067a63;
+  color: #2f6b1e;
   background: var(--accent-light);
-  border: 1px solid rgba(0,184,148,.35);
+  border: 1px solid rgba(63,143,40,.35);
   border-left: 3px solid var(--accent);
   border-radius: 8px;
 }
@@ -442,6 +460,7 @@ select.input:disabled {
 .draft-head { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
 .draft-head-title { white-space: nowrap; }
 .draft-head-title em { font-style: normal; font-weight: 700; color: var(--danger); }
+.draft-block .count-bar { padding: 0 2px 10px; }
 .inst-row {
   display: flex; align-items: center; gap: 8px;
   background: #fff; border: 1px solid var(--line); border-radius: 10px;
@@ -529,7 +548,7 @@ select.input:disabled {
 }
 .step-btn {
   width: 36px; height: 100%; border: none; border-radius: 0;
-  background: #f4f7fd; color: var(--primary); font-size: 22px; font-weight: 700;
+  background: #f3f8fc; color: var(--primary); font-size: 22px; font-weight: 700;
   cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;
 }
 .step-btn:active { background: var(--primary-light); }
@@ -553,44 +572,45 @@ select.input:disabled {
 }
 .subpkg-no {
   font-size: 13px; font-weight: 700; color: var(--primary);
-  background: #fff; border: 1px solid rgba(37,99,235,.3);
+  background: #fff; border: 1px solid rgba(26,114,184,.3);
   padding: 2px 9px; border-radius: 999px; flex: 0 0 auto;
 }
 .subpkg-name {
   font-size: 17px; font-weight: 700; color: var(--text); flex: 1; min-width: 0;
   line-height: 1.4; word-break: break-all;
 }
-/* 分包卡统计面板：统计标签 + 重新编辑按钮同一行（统计紧凑靠左、按钮靠右） */
+/* 分包卡统计：与合计条同一套圆点数字，编辑做成文字按钮，避免再抢一层视觉 */
 .subpkg-panel {
-  display: flex; align-items: center; gap: 6px;
-  margin: 0 8px 10px;
-  background: linear-gradient(180deg, #f4f8ff, #fafcff);
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 12px 10px;
+  padding: 8px 10px;
+  background: #f7f9fc;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 7px 6px 7px 8px;
+  border-radius: 10px;
 }
-/* 统计项：圆点 + 文字紧凑展示，占用最小，为右侧按钮留足位置 */
-.subpkg-stats {
+.subpkg-panel .subpkg-stats {
   flex: 1; min-width: 0; overflow: hidden;
-  justify-content: flex-start; padding: 0;
-  flex-wrap: nowrap; gap: 2px; background: transparent; border: none; font-size: 13px; font-weight: 600;
+  display: flex; flex-wrap: nowrap; align-items: center;
+  gap: 10px; padding: 0; margin: 0;
+  background: transparent; border: none;
+  font-size: 13px; font-weight: 600;
 }
-.subpkg-stats .count-item {
-  gap: 2px; padding: 0; flex: 0 0 auto;
-  background: transparent; border: none; box-shadow: none;
-}
-.subpkg-stats .dot { width: 6px; height: 6px; }
-.subpkg-stats .count-label { color: var(--text-2); }
-.subpkg-stats .count-num { color: var(--text); }
-/* 分包操作按钮：头部删除（实心红）/ 统计行重新编辑（淡蓝小按钮 + 图标） */
-.subpkg-edit, .subpkg-del { flex: 0 0 auto; padding: 8px 12px; font-size: 15px; font-weight: 700; border-radius: 8px; white-space: nowrap; }
+.subpkg-panel .count-item { gap: 4px; }
+.subpkg-panel .dot { width: 6px; height: 6px; }
 .subpkg-edit {
-  display: inline-flex; align-items: center; gap: 3px;
-  background: var(--primary-light); color: var(--primary-dark);
-  border-color: rgba(37,99,235,.35);
+  flex: 0 0 auto;
+  border: none; background: transparent;
+  color: var(--primary); font-family: inherit;
+  font-size: 14px; font-weight: 700;
+  padding: 4px 2px; line-height: 1; cursor: pointer;
+  white-space: nowrap;
 }
-.subpkg-edit:active { background: #dbe7ff; }
-.subpkg-del { color: #fff; border-color: var(--danger); background: var(--danger); }
+.subpkg-edit:active { opacity: .7; }
+.subpkg-del {
+  flex: 0 0 auto; padding: 8px 12px; font-size: 15px; font-weight: 700;
+  border-radius: 8px; white-space: nowrap; color: #fff;
+  border-color: var(--danger); background: var(--danger);
+}
 .subpkg-del:active { background: #c92f35; }
 .subpkg-arrow { color: var(--text-3); font-size: 14px; font-weight: 700; }
 .subpkg-body { padding: 0 12px 10px; }
@@ -598,13 +618,13 @@ select.input:disabled {
 .subpkg-total {
   display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px;
   background: linear-gradient(90deg, var(--primary-light), #fff 75%);
-  border: 1px solid rgba(37,99,235,.22);
+  border: 1px solid rgba(26,114,184,.22);
   border-radius: 10px; padding: 8px 12px; margin-bottom: 10px;
   font-size: 14px; font-weight: 600; color: var(--text-2);
 }
 .subpkg-total-label {
   font-size: 13px; font-weight: 700; color: var(--primary-dark);
-  background: #fff; border: 1px solid rgba(37,99,235,.25);
+  background: #fff; border: 1px solid rgba(26,114,184,.25);
   padding: 2px 8px; border-radius: 5px; flex: 0 0 auto;
 }
 .subpkg-total .count-item { gap: 5px; }
@@ -661,9 +681,9 @@ select.input:disabled {
 .success-wrap { padding-top: 30px; text-align: center; }
 .success-icon {
   width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 16px;
-  background: linear-gradient(135deg, #00c9a0, #00b894); color: #fff;
+  background: linear-gradient(135deg, #58a932, #3f8f28); color: #fff;
   font-size: 34px; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 24px rgba(0,184,148,.35);
+  box-shadow: 0 8px 24px rgba(63,143,40,.35);
 }
 .success-title { font-size: 22px; font-weight: 700; }
 .success-sub { font-size: 15px; font-weight: 600; color: var(--text-2); margin: 8px 0 22px; }
@@ -707,13 +727,13 @@ select.input:disabled {
 .preview-pkg-total {
   display: flex; align-items: center; flex-wrap: nowrap; gap: 0 6px;
   background: linear-gradient(90deg, #edf4ff, #f8fbff);
-  border: 1px solid rgba(37,99,235,.18); border-radius: 12px;
+  border: 1px solid rgba(26,114,184,.18); border-radius: 12px;
   padding: 8px 10px; margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--text-2);
   overflow: hidden;
 }
 .preview-pkg-total-count {
   font-weight: 700; color: var(--primary-dark);
-  background: #fff; border: 1px solid rgba(37,99,235,.25);
+  background: #fff; border: 1px solid rgba(26,114,184,.25);
   padding: 2px 7px; border-radius: 6px; flex: 0 0 auto; white-space: nowrap;
 }
 .preview-pkg-total .count-item { gap: 4px; flex: 0 0 auto; }

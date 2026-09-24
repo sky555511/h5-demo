@@ -88,7 +88,7 @@ var CONFIG = {
 | `API.getHospitals()` | GET `/hospital/list` | `nameOrCode=&page=1&pageSize=999`，返回扁平 `{id, name}` 列表 |
 | `API.getDepartments(hospitalId)` | GET `/department/listByHospital` | 按医院加载使用科室（`isOperationRoom=true`）；选医院时自动加载 |
 | `API.getPackages(nameOrCode)` | GET `/package/list` | `ifOut=true + 当前登录供应商 supplierId`，返回包模板列表（不含组成） |
-| `API.getPackageCompositions(packageTemplateId)` | GET `/package/getPackageCompositions` | 包组成明细，normalize 为 h5 器械结构（选包时自动加载） |
+| `API.getPackageCompositions(packageTemplateId)` | GET `/package/getPackageCompositions` | 包组成明细（`ifUseOrder=false&ifOutTypeOrder=true`），normalize 为 h5 器械结构（选包时自动加载） |
 | `API.getAllInstruments()` | GET `/instrument/list` | `dataFlag=true&isRentInstrument=true&unitNameOrCode=<供应商名称>`，返回全部器械库 |
 | `API.getOrderList(params, page, pageSize)` | GET `/out/getOutOrderList` | params 传 `{ timeRange, hospitalId, hospitalizationNum, doctorName, serialNumber }`（`supplierId` 必须传当前登录供应商 id；`orderStatus` 不传=全部状态）；返回 `{ list, total }`，时间戳 normalize 为 `YYYY-MM-DD HH:mm`；列表支持**上拉加载更多**（每页 20 条） |
 | `API.getOutInstrumentOrder(id)` | GET `/out/getOutInstrumentOrder` | 订单主信息（编辑回填） |
