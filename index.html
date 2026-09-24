@@ -2,9 +2,9 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>消毒供应运营管理系统 · 供应商端</title>
-  <link rel="stylesheet" href="css/app.css?v=20260917-pkg10">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>外来厂家下单平台</title>
+  <link rel="stylesheet" href="css/app.css?v=20260924-ui12">
 </head>
 <body>
   <div id="app">
@@ -24,7 +24,7 @@
       <main v-show="view === 'login'" class="app-main page-login">
         <div class="login-inner">
           <div class="login-brand">
-            <div class="login-logo"><img src="img/logo.png" alt="外来厂家下单平台"></div>
+            <div class="login-logo"><img src="img/logo-login.png" alt="外来厂家下单平台"></div>
             <div class="login-title">外来厂家下单平台</div>
           </div>
           <div class="login-card">
@@ -208,33 +208,22 @@
             <div v-if="draftCompositions.length" class="draft-block">
               <div class="draft-head">
                 <span class="draft-head-title">当前器械（<em>{{ draftCompositions.length }}</em> 种 / 共 <em>{{ draftTotalNum }}</em> 件）</span>
-                <span class="draft-hint">点击「分包」生成分包</span>
               </div>
               <div class="count-bar">
                 <span class="count-item"><i class="dot dot-tool"></i><span class="count-label">器械 </span><span class="count-num">{{ draftSummary.applianceNum }}</span></span>
                 <span class="count-item"><i class="dot dot-implant"></i><span class="count-label">植入物 </span><span class="count-num">{{ draftSummary.implantsNum }}</span></span>
                 <span class="count-item"><i class="dot dot-power"></i><span class="count-label">电动工具 </span><span class="count-num">{{ draftSummary.electricToolNum }}</span></span>
               </div>
-              <div v-for="c in draftCompositions" :key="pickKey(c)" class="inst-row inst-row-edit" :class="rowClass(c.type)">
-                <div class="inst-main">
-                  <div class="inst-name">
-                    <span class="inst-name-text">{{ c.applianceName }}</span>
+              <div v-for="c in draftCompositions" :key="pickKey(c)" class="inst-row inst-row-edit inst-row-stacked" :class="rowClass(c.type)">
+                <div class="inst-name"><span class="inst-name-text">{{ c.applianceName }}</span><span class="inst-type" :class="typeClass(c.type)">{{ c.type }}</span></div>
+                <div class="inst-spec-line"><span class="spec-item"><span class="spec-label">规格</span>{{ c.specifical || '-' }}</span><span class="spec-item"><span class="spec-label">型号</span>{{ c.model || '-' }}</span></div>
+                <div class="inst-edit-foot">
+                  <div class="num-stepper">
+                    <button class="step-btn" @click="decNum(c)">−</button>
+                    <input type="number" min="1" max="999" class="num-input" :value="c.num" @input="setNum(c, $event.target.value)">
+                    <button class="step-btn" @click="incNum(c)">＋</button>
                   </div>
-                  <div class="inst-spec-stack">
-                    <div>规格 {{ c.specifical || '-' }}</div>
-                    <div>型号 {{ c.model || '-' }}</div>
-                  </div>
-                </div>
-                <div class="inst-side">
-                  <span class="inst-type" :class="typeClass(c.type)">{{ c.type }}</span>
-                  <div class="inst-side-actions">
-                    <div class="num-stepper">
-                      <button class="step-btn" @click="decNum(c)">−</button>
-                      <input type="number" min="1" max="999" class="num-input" :value="c.num" @input="setNum(c, $event.target.value)">
-                      <button class="step-btn" @click="incNum(c)">＋</button>
-                    </div>
-                    <button class="del-text" @click="removeFromDraft(c)">删除</button>
-                  </div>
+                  <button class="del-text" @click="removeFromDraft(c)">删除</button>
                 </div>
               </div>
             </div>
@@ -265,20 +254,16 @@
                 <button class="btn btn-ghost btn-sm subpkg-edit" @click.stop="editSubpackage(sp)">重新编辑</button>
               </div>
               <div v-show="sp.open" class="subpkg-body">
-                <div v-for="c in sp.compositions" :key="pickKey(c)" class="inst-row sub" :class="rowClass(c.type)">
-                  <div class="inst-main">
-                    <div class="inst-name"><span class="inst-name-text">{{ c.applianceName }}</span></div>
-                    <div class="inst-spec-stack">
-                      <div>规格 {{ c.specifical || '-' }}</div>
-                      <div>型号 {{ c.model || '-' }}</div>
+                <div v-for="c in sp.compositions" :key="pickKey(c)" class="inst-row sub inst-row-stacked" :class="rowClass(c.type)">
+                  <div class="inst-name"><span class="inst-name-text">{{ c.applianceName }}</span><span class="inst-type" :class="typeClass(c.type)">{{ c.type }}</span></div>
+                  <div class="inst-spec-line"><span class="spec-item"><span class="spec-label">规格</span>{{ c.specifical || '-' }}</span><span class="spec-item"><span class="spec-label">型号</span>{{ c.model || '-' }}</span></div>
+                  <div class="inst-edit-foot">
+                    <div class="num-stepper">
+                      <button class="step-btn" @click="subDecNum(sp, c)">−</button>
+                      <input type="number" min="1" max="999" class="num-input" :value="c.num" @input="subSetNum(sp, c, $event.target.value)">
+                      <button class="step-btn" @click="subIncNum(sp, c)">＋</button>
                     </div>
-                  </div>
-                  <div class="inst-side">
-                    <span class="inst-type" :class="typeClass(c.type)">{{ c.type }}</span>
-                    <div class="inst-side-actions">
-                      <span class="sub-num">{{ c.num }} 件</span>
-                      <button class="del-btn" @click="removeCompositionFromSubpackage(sp, c)">✕</button>
-                    </div>
+                    <button class="del-text" @click="removeCompositionFromSubpackage(sp, c)">删除</button>
                   </div>
                 </div>
               </div>
@@ -329,10 +314,7 @@
                     <span class="preview-line-name">{{ c.applianceName }}</span>
                     <span class="preview-line-num">×{{ c.num }}</span>
                   </div>
-                  <div class="preview-line-spec">
-                    <div>规格 {{ c.specifical || '-' }}</div>
-                    <div>型号 {{ c.model || '-' }}</div>
-                  </div>
+                  <div class="inst-spec-line"><span class="spec-item"><span class="spec-label">规格</span>{{ c.specifical || '-' }}</span><span class="spec-item"><span class="spec-label">型号</span>{{ c.model || '-' }}</span></div>
                 </div>
               </div>
             </div>
@@ -366,10 +348,7 @@
             <div class="pick-check">{{ isPicked(c) ? '✓' : '' }}</div>
             <div class="inst-main">
               <div class="inst-name"><span class="inst-name-text">{{ c.applianceName }}</span></div>
-              <div class="inst-spec-stack">
-                <div>规格 {{ c.specifical || '-' }}</div>
-                <div>型号 {{ c.model || '-' }}</div>
-              </div>
+              <div class="inst-spec-line"><span class="spec-item"><span class="spec-label">规格</span>{{ c.specifical || '-' }}</span><span class="spec-item"><span class="spec-label">型号</span>{{ c.model || '-' }}</span></div>
             </div>
             <div class="inst-side" @click.stop>
               <span class="inst-type" :class="typeClass(c.type)">{{ c.type }}</span>
@@ -472,7 +451,7 @@
   <script src="js/vendor/vue.min.js"></script>
   <script src="js/vendor/qrcode.min.js"></script>
   <script src="js/vendor/crypto-js.js"></script>
-  <script src="js/api.js?v=20260917-pkg10"></script>
-  <script src="js/app.js?v=20260917-pkg10"></script>
+  <script src="js/api.js?v=20260924-ui5"></script>
+  <script src="js/app.js?v=20260924-ui11"></script>
 </body>
 </html>

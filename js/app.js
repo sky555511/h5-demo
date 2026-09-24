@@ -20,6 +20,20 @@
     return isNaN(n) ? fallback : n
   }
 
+  // 器械明细排序：先按类型（器械 → 植入物 → 电动工具 → 辅助材料），同类再按名称拼音
+  var TYPE_RANK = { '器械': 0, '植入物': 1, '电动工具': 2, '辅助材料': 3 }
+
+  function byTypeThenName (a, b) {
+    var d = (TYPE_RANK[a.type] === undefined ? 9 : TYPE_RANK[a.type]) -
+            (TYPE_RANK[b.type] === undefined ? 9 : TYPE_RANK[b.type])
+    if (d) return d
+    return String(a.applianceName || '').localeCompare(String(b.applianceName || ''), 'zh-Hans-CN')
+  }
+
+  function sortComps (list) {
+    return (list || []).slice().sort(byTypeThenName)
+  }
+
   // GB2312 拼音首字母分界（I/U/V 不出现）。用于包名首字母检索，不依赖后端 pinyin 字段。
   var PY_LETTERS = 'ABCDEFGHJKLMNOPQRSTWXYZ'
   var PY_BOUNDARIES = '阿八嚓哒妸发旮哈讥咔垃痳拏噢妑七呥扨它穵夕丫帀'
@@ -383,9 +397,10 @@
           }
           return true
         })
-        // 未勾选在上、已勾选在下（组内保持原顺序）
+        // 未勾选在上、已勾选在下；组内再按类型（器械 → 植入物 → 电动工具）+ 名称
         list.sort(function (a, b) {
-          return (self.isPicked(a) ? 1 : 0) - (self.isPicked(b) ? 1 : 0)
+          var d = (self.isPicked(a) ? 1 : 0) - (self.isPicked(b) ? 1 : 0)
+          return d || byTypeThenName(a, b)
         })
         return list
       },
@@ -637,12 +652,12 @@
         }).then(function (results) {
           var subs = results[0] || []
           var pkgComps = results[1] || []
-          if (self.currentPackage) self.currentPackage.compositions = pkgComps
+          if (self.currentPackage) self.currentPackage.compositions = sortComps(pkgComps)
           // 详情接口不带回规格/型号/电动工具，用器械库 + 包组成补齐
           self.subpackages = subs.map(function (sp) {
-            sp.compositions = (sp.compositions || []).map(function (c) {
+            sp.compositions = sortComps((sp.compositions || []).map(function (c) {
               return self.enrichCompositionFromCatalog(c)
-            })
+            }))
             var counts = calcCounts(sp.compositions)
             sp.applianceNum = counts.applianceNum
             sp.implantsNum = counts.implantsNum
@@ -721,9 +736,9 @@
         this.addCurrentPackageCompositionsToPickList()
         API.getPackageCompositions(p.id).then(function (comps) {
           if (self.currentPackage && self.currentPackage.id === p.id) {
-            self.currentPackage.compositions = comps || []
+            self.currentPackage.compositions = sortComps(comps)
             // 保留接口返回的数量（0 / 空值都按 0）
-            self.draftCompositions = (comps || []).map(function (c) { return Object.assign(clone(c), { num: parseNum(c.num, 0) }) })
+            self.draftCompositions = sortComps((comps || []).map(function (c) { return Object.assign(clone(c), { num: parseNum(c.num, 0) }) }))
             // 后端返回的组成可能与初始补的不同，重新补一次，确保 pickList 与 currentPackage.compositions 完全一致
             self.addCurrentPackageCompositionsToPickList()
           }
@@ -909,7 +924,7 @@
           // 编辑分包：替换器械并重算统计，保留分包序号与位置
           var sp = this.subpackages[this.pickSubIndex]
           if (sp) {
-            var comps = Object.keys(this.pickSelected).map(function (k) { return clone(self.pickSelected[k]) })
+            var comps = sortComps(Object.keys(this.pickSelected).map(function (k) { return clone(self.pickSelected[k]) }))
             if (!comps.length) {
               this.removeSubpackage(sp) // 器械全部取消勾选：直接删除该分包，避免提交空分包
             } else {
@@ -927,7 +942,7 @@
           return
         }
         // 选择器械 = 编辑草稿：用当前勾选结果覆盖草稿（取消勾选即从草稿移除，数量一并带回）
-        this.draftCompositions = Object.keys(this.pickSelected).map(function (k) { return clone(self.pickSelected[k]) })
+        this.draftCompositions = sortComps(Object.keys(this.pickSelected).map(function (k) { return clone(self.pickSelected[k]) }))
         this.pickMode = ''
         this.pickSubIndex = -1
         this.view = 'create'
@@ -941,6 +956,16 @@
         if (n > 999) { n = 999 }
         if (c && c.num !== n) this.$set(c, 'num', n)
       },
+      // 分包内数量可直接改：改完必须重算该分包分类统计，否则合计条与订单预览不跟随
+      recalcSubpackageCounts: function (sp) {
+        var counts = calcCounts(sp.compositions)
+        sp.applianceNum = counts.applianceNum
+        sp.implantsNum = counts.implantsNum
+        sp.electricToolNum = counts.electricToolNum
+      },
+      subIncNum: function (sp, c) { this.incNum(c); this.recalcSubpackageCounts(sp) },
+      subDecNum: function (sp, c) { this.decNum(c); this.recalcSubpackageCounts(sp) },
+      subSetNum: function (sp, c, val) { this.setNum(c, val); this.recalcSubpackageCounts(sp) },
       removeFromDraft: function (c) {
         var self = this
         this.confirmDialog('是否删除？', function () {
