@@ -446,6 +446,7 @@ window.API = (function () {
       bookDepartmentId: o.departmentModel ? o.departmentModel.id : null,
       packageTemplateId: o.packageTemplateModel ? o.packageTemplateModel.id : null,
       packageTemplateName: o.packageTemplateModel ? o.packageTemplateModel.name : '',
+      emergencyType: o.emergencyType == null ? null : Number(o.emergencyType),
       hospitalizationNum: o.hospitalizationNum || '',
       patientName: o.patientName || '',
       doctorName: o.doctorName || '',
@@ -537,6 +538,7 @@ window.API = (function () {
       bookHospitalId: order.bookHospitalId,
       useDepartmentId: order.bookDepartmentId, // 后端科室字段名为 useDepartmentId
       supplierId: order.supplierId,
+      emergencyType: order.emergencyType,
       hospitalizationNum: order.hospitalizationNum,
       patientName: order.patientName,
       doctorName: order.doctorName,
