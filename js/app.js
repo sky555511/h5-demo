@@ -282,7 +282,7 @@
         if (this.view === 'create') return this.editFlag ? '修改订单' : '创建订单'
         if (this.view === 'pick') return '选择器械'
         if (this.view === 'success') return this.editFlag ? '修改成功' : '下单成功'
-        return '消毒供应运营管理系统'
+        return '订单管理'
       },
       headerBack: function () {
         return this.view !== 'orderList' && this.view !== 'login'
@@ -576,7 +576,21 @@
         return this.isRecycled(o) ? '已回收' : '待回收'
       },
       statusClass: function (o) {
-        return this.isRecycled(o) ? 'recycled' : ''
+        return this.isRecycled(o) ? 'recycled' : 'pending'
+      },
+      emergencyTypeText: function (o) {
+        var t = o && o.emergencyType
+        if (t === 0 || t === '0') return '择期'
+        if (t === 1 || t === '1') return '急诊'
+        if (t === 2 || t === '2') return '备用'
+        return ''
+      },
+      emergencyTypeClass: function (o) {
+        var t = o && o.emergencyType
+        if (t === 1 || t === '1') return 'emg'
+        if (t === 2 || t === '2') return 'stdby'
+        if (t === 0 || t === '0') return 'elec'
+        return ''
       },
       showQrcode: function (o) {
         this.qrcodeOrder = o
