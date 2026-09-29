@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>外来厂家下单平台</title>
-  <link rel="stylesheet" href="css/app.css?v=20260924-ui37">
+  <link rel="stylesheet" href="css/app.css?v=20260928-ui42">
 </head>
 <body>
   <div id="app">
@@ -22,12 +22,12 @@
 
       <!-- ============ 视图：登录 ============ -->
       <main v-show="view === 'login'" class="app-main page-login">
-        <div class="login-inner">
-          <div class="login-brand">
-            <div class="login-badge"><div class="login-badge-circ"><img src="img/logo-login.png" alt="外来厂家下单平台"></div></div>
-            <div class="login-title">外来厂家下单平台</div>
-            <!-- <div class="login-sub">供应商外网下单 · 安全登录</div> -->
-          </div>
+        <div class="login-hero">
+          <div class="login-badge"><div class="login-badge-circ"><img src="img/logo-login.png" alt="外来厂家下单平台"></div></div>
+          <div class="login-title">外来厂家下单平台</div>
+          <div class="login-title-bar"></div>
+        </div>
+        <div class="login-body">
           <div class="login-card">
             <div class="form-item">
               <label class="form-label">账号</label>
@@ -52,6 +52,7 @@
               {{ logging ? '登录中…' : '登 录' }}
             </button>
           </div>
+          <img src="img/logo-login.png" alt="" aria-hidden="true" class="login-watermark">
         </div>
       </main>
 

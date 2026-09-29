@@ -190,36 +190,67 @@ select.input:disabled {
 
 /* ============ 登录页 ============ */
 .page-login {
-  padding: 0 24px calc(28px + env(safe-area-inset-bottom));
-  background: linear-gradient(155deg, #d3e9fb 0%, #e6f2fa 42%, #e6f3d5 100%);
+  position: relative;
+  padding: 0;
+  background: #edf3f9;
   display: flex; flex-direction: column;
   min-height: 100%;
 }
-.login-inner { width: 100%; }
-.login-brand { text-align: center; padding-top: min(88px, 11vh); }
-.login-badge { width: 100px; height: 100px; margin: 0 auto 14px; position: relative; }
-.login-badge-circ {
-  width: 100px; height: 100px;
-  display: flex; align-items: center; justify-content: center;
+.login-hero {
+  position: relative; overflow: hidden; text-align: center;
+  padding: min(58px, 7vh) 24px 84px;
+  border-radius: 0 0 30px 30px;
+  background:
+    radial-gradient(260px 180px at 50% 108px, rgba(255,255,255,.18), transparent 72%),
+    radial-gradient(340px 340px at 8% -8%, rgba(120,184,40,.40), transparent 62%),
+    radial-gradient(420px 420px at 104% 112%, rgba(255,255,255,.12), transparent 60%),
+    linear-gradient(168deg, #0e4f86 0%, #1a72b8 62%, #2e92c8 100%);
+  flex: 0 0 auto;
 }
-.login-badge-circ img { width: 90px; height: 90px; object-fit: contain; display: block; }
-.login-title { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: #143a5c; }
-.login-sub {
-  margin-top: 6px; font-size: 13px; font-weight: 600; letter-spacing: .4px;
-  color: #5f7b94;
+.login-hero::before {
+  content: ""; position: absolute; top: -74px; right: -58px;
+  width: 232px; height: 232px; border-radius: 50%;
+  border: 30px solid rgba(255,255,255,.08);
+}
+.login-hero::after {
+  content: ""; position: absolute; left: -14%; bottom: -150px;
+  width: 128%; height: 240px; border-radius: 50%;
+  background: linear-gradient(90deg, rgba(142,198,63,.30), rgba(255,255,255,.12) 55%, rgba(74,160,216,.26));
+  transform: rotate(-7deg);
+  filter: blur(10px);
+}
+.login-badge { width: 108px; height: 108px; margin: 0 auto; position: relative; z-index: 1; }
+.login-badge-circ {
+  width: 108px; height: 108px;
+  background: #fff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 12px 30px rgba(3,30,56,.35);
+}
+.login-badge-circ img { width: 68px; height: 68px; object-fit: contain; display: block; }
+.login-title {
+  position: relative; z-index: 1;
+  margin-top: 18px; font-size: 24px; font-weight: 800;
+  letter-spacing: 2px; color: #fff;
+}
+.login-title-bar {
+  position: relative; z-index: 1;
+  width: 34px; height: 4px; border-radius: 2px; margin: 14px auto 0;
+  background: linear-gradient(90deg, #8ec63f, #4aa0d8);
+}
+.login-body {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 0 20px calc(28px + env(safe-area-inset-bottom));
 }
 .login-card {
-  background: #fff; border-radius: 18px; padding: 22px 18px 20px;
-  border: 1.5px solid transparent;
-  background-image: linear-gradient(#fff, #fff), linear-gradient(135deg, #1a72b8, #78b828);
-  background-origin: border-box; background-clip: padding-box, border-box;
-  box-shadow: 0 16px 40px rgba(20,80,130,.18);
-  margin-top: 34px;
+  position: relative; z-index: 1;
+  background: #fff; border-radius: 20px; padding: 26px 20px 24px;
+  box-shadow: 0 18px 44px rgba(9,55,95,.22);
+  margin-top: -54px;
 }
-.login-card .form-item { margin-bottom: 13px; }
-.login-card .form-label { font-size: 15px; font-weight: 800; margin-bottom: 6px; color: #1b3149; }
+.login-card .form-item { margin-bottom: 16px; }
+.login-card .form-label { font-size: 15px; font-weight: 800; margin-bottom: 7px; color: #1b3149; }
 .login-card .input {
-  height: 48px; border-radius: 11px; border: 1.5px solid #e4ecf3;
+  height: 48px; border-radius: 12px; border: 1.5px solid #e4ecf3;
   background: #f4f7fa; font-size: 16px;
 }
 .login-card .input:focus {
@@ -235,10 +266,15 @@ select.input:disabled {
 .pwd-wrap .input { padding-left: 42px; }
 .login-card .input::placeholder { color: #7f95a9; }
 .login-btn {
-  margin-top: 18px; height: 48px; border-radius: 11px;
+  margin-top: 22px; height: 50px; border-radius: 14px;
   font-size: 17px;
-  background: linear-gradient(180deg, #1f7cc0, #16639c);
-  box-shadow: 0 6px 16px rgba(22,99,156,.32);
+  background: linear-gradient(180deg, #2a86c8, #16639c);
+  box-shadow: 0 8px 18px rgba(13,80,130,.35), inset 0 1px 0 rgba(255,255,255,.28);
+}
+.login-watermark {
+  position: absolute; right: 6px; bottom: 6px;
+  width: 190px; height: 190px; object-fit: contain;
+  opacity: .05; pointer-events: none;
 }
 .pwd-wrap { position: relative; }
 .pwd-input { padding-right: 50px; }
